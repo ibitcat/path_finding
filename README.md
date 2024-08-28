@@ -1,2 +1,6 @@
-# path_finding
-path finding  algorithm.
+# 寻路算法演示
+
+- 广度优先算法
+- dijkstra算法
+- 最佳优先搜索算法
+- A 星寻路算法

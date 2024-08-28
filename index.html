@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html>
+
+<!--head-->
+
+<head>
+    <meta charset="utf-8">
+    <title>A*寻路算法</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script text="text/javascript" src="jquery-3.7.1.min.js"></script>
+    <script text="text/javascript" src="minheap.js"></script>
+</head>
+
+<!--body-->
+
+<body style="margin-left: 50px;margin-top: 30px;">
+    <div style="float: left; width: 20%;">
+        <div class="line">
+            <span style="font-size: 14px;">地图宽：</span>
+            <select id="mapWidth" style="width: 100px;">
+                <option value="10" selected="selected">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+            </select>
+        </div>
+        <div class="line">
+            <span style="font-size: 14px;">地图高：</span>
+            <select id="mapHeight" style="width: 100px;">
+                <option value="10" selected="selected">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+            </select>
+        </div>
+        <!--div class="line">
+            <span style="font-size: 14px;">方格宽高：</span>
+            <select id="boxSize">
+                <option value="30" selected="selected">30px</option>
+                <option value="40">40px</option>
+            </select>
+        </div-->
+        <div class="line">
+            <button type="button" id="createMap">生成地图</button>
+        </div>
+
+        <div class="line">
+            <input type="button" value="开始坐标(红色)" id="srcPos" />
+            <input type="button" value="结束坐标(蓝色)" id="dstPos" />
+        </div>
+
+        <div class="line">
+            <span style="font-size: 14px;">允许斜着走：</span>
+            <input type="checkbox" value="0" id="dirType" />
+        </div>
+
+        <div class="line">
+            <span style="font-size: 14px;">运行速度：</span>
+            <select id="interval">
+                <option value="100">100毫秒</option>
+                <option value="200">200毫秒</option>
+                <option value="500">500毫秒</option>
+                <option value="1000" selected="selected">1秒</option>
+                <option value="3000">3秒</option>
+            </select>
+        </div>
+
+        <div class="line" id="hn">
+            <span style="font-size: 14px;">启发式函数：</span>
+            <select id="disType">
+                <option value="0" selected="selected">曼哈顿距离</option>
+                <option value="1">欧几里得距离</option>
+            </select>
+        </div>
+
+        <div class="line">
+            <button type="button" id="start">开始</button>
+            <button type="button" id="pause">暂停</button>
+            <button type="button" id="reset">还原</button>
+        </div>
+    </div>
+
+    <div style="float: left; width: 80%; ">
+        <div class="line" id="map">
+            <div class='col'>
+            </div>
+        </div>
+    </div>
+
+    <script text="text/javascript" src="init.js"></script>
+    <script text="text/javascript">
+        $(function () {
+            console.log("init");
+            initMap();
+        });
+    </script>
+</body>
+
+</html>
