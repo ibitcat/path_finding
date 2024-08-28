@@ -14,6 +14,7 @@ var isPause = false;        // 是否暂停
 var timerId;                // 定时器id
 var interval = 1000;        // 定时器间隔时间(毫秒)
 var cameFrom = {};          // 父节点
+var algorithm = 0;          // 寻路算法
 
 function newBox(x, y, val) {
     let boxCls = "node_" + boxSize;
@@ -123,16 +124,28 @@ function createNode(x, y, parent, stepCost) {
         if (parent != null) {
             gn = parent.g + stepCost;
         }
+
         let hn = heuristic(x, y, dstX, dstY);
         let node = { f: hn + gn, g: gn, h: hn, x: x, y: y };
         return node;
     } else if (algorithm == 1) {
-        // dijkstra
+        // dijkstra(没有启发函数)
+        let gn = 0;
+        let hn = 0;
+        if (parent != null) {
+            gn = parent.g + stepCost;
+        }
+        let node = { f: hn + gn, g: gn, h: hn, x: x, y: y };
+        return node;
     } else if (algorithm == 2) {
-        // 
+        // 最佳优先搜索算法
+        let gn = 0;
+        let deltaX = Math.abs(x - dstX);
+        let deltaY = Math.abs(y - dstY);
+        let hn = Math.floor(Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 10);
+        let node = { f: hn + gn, g: gn, h: hn, x: x, y: y };
+        return node;
     }
-
-    return node;
 }
 
 // 开始寻路
@@ -148,9 +161,8 @@ function findPath() {
     });
     cameFrom = {};
 
-    let hn = heuristic(srcX, srcY, dstX, dstY);
-    let node = { f: hn, g: 0, h: hn, x: srcX, y: srcY };
-    minHeap.push(node);
+    let srcNode = createNode(srcX, srcY, null, 0);
+    minHeap.push(srcNode);
 
     //timerId = window.setInterval(starStep, interval, minHeap)
     timerId = window.setInterval(function () {
@@ -197,11 +209,11 @@ function findPath() {
 // 搜索方向(上,下,右,左,右上,左上,右下,左下)
 var dirs = [[0, 1, 10], [0, -1, 10], [1, 0, 10], [-1, 0, 10], [1, 1, 14], [-1, 1, 14], [1, -1, 14], [-1, -1, 14]];
 var arrows = ["↑", "↓", "←", "→", "↖", "↗", "↙", "↘"];
-function neighborNode(minHeap, node) {
+function neighborNode(minHeap, parent) {
     for (let i = 0; i < dirType; i++) {
         let dir = dirs[i];
-        let x = node.x + dir[0];
-        let y = node.y + dir[1];
+        let x = parent.x + dir[0];
+        let y = parent.y + dir[1];
         let stepCost = dir[2];
 
         if (x < 0 || x >= width || y < 0 || y >= height) {
@@ -220,12 +232,12 @@ function neighborNode(minHeap, node) {
         if (index > 0) {
             // 在堆中
             let nnode = minHeap.getElem(index);
-            if (nnode.g > node.g + stepCost) {
+            if (nnode.g > parent.g + stepCost) {
                 // 更新确定代价
-                nnode.g = node.g + stepCost;
+                nnode.g = parent.g + stepCost;
                 nnode.f = nnode.g + nnode.h;
                 minHeap.update(index, nnode);
-                cameFrom[nnode.x * 1000 + nnode.y] = node;
+                cameFrom[nnode.x * 1000 + nnode.y] = parent;
 
                 $(boxId + " .fn").text(nnode.f);
                 $(boxId + " .gn").text(nnode.g);
@@ -234,10 +246,9 @@ function neighborNode(minHeap, node) {
             }
         } else {
             // 可行走
-            let hn = heuristic(x, y, dstX, dstY);
-            let nnode = { f: node.g + stepCost + hn, g: node.g + stepCost, h: hn, x: x, y: y };
+            let nnode = createNode(x, y, parent, stepCost);
             minHeap.push(nnode);
-            cameFrom[nnode.x * 1000 + nnode.y] = node;
+            cameFrom[nnode.x * 1000 + nnode.y] = parent;
 
             setBoxColor(nnode.x, nnode.y, 4);
             $(boxId + " .fn").text(nnode.f);
@@ -285,6 +296,7 @@ function disableDom(v) {
     $("#dirType").attr('disabled', v);
     $("#disType").attr('disabled', v);
     $("#interval").attr('disabled', v);
+    $("#algorithm").attr('disabled', v);
 }
 
 // dom 响应
@@ -314,6 +326,17 @@ $("#srcPos").click(function () {
 $("#dstPos").click(function () {
     state = 2;
     disableDom(true);
+})
+
+// 选择寻路算法
+$("#algorithm").click(function () {
+    algorithm = parseInt($(this).val());
+
+    if (algorithm == 0) {
+        $("#hn").css("display", "block");
+    } else {
+        $("#hn").css("display", "none");
+    }
 })
 
 // 选择启发函数
