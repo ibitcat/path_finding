@@ -329,7 +329,7 @@ $("#dstPos").click(function () {
 })
 
 // 选择寻路算法
-$("#algorithm").click(function () {
+$("#algorithm").on("change", function () {
     algorithm = parseInt($(this).val());
 
     if (algorithm == 0) {
@@ -340,7 +340,7 @@ $("#algorithm").click(function () {
 })
 
 // 选择启发函数
-$("#disType").click(function () {
+$("#disType").on("change", function () {
     disType = parseInt($(this).val());
 })
 
@@ -354,7 +354,7 @@ $("#dirType").click(function () {
 })
 
 // 选择展示速度
-$("#interval").click(function () {
+$("#interval").on("change", function () {
     interval = parseInt($(this).val());
 })
 
