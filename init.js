@@ -173,6 +173,7 @@ function findPath() {
         if (minHeap.isEmpty()) {
             console.log("没有可搜索的节点");
             clearInterval(timerId);
+            alert("没有可搜索的节点");
             return;
         }
 
@@ -297,6 +298,8 @@ function disableDom(v) {
     $("#disType").attr('disabled', v);
     $("#interval").attr('disabled', v);
     $("#algorithm").attr('disabled', v);
+    $("#randObstacle").attr('disabled', v);
+    $("#obstacleNum").attr('disabled', v);
 }
 
 // dom 响应
@@ -309,6 +312,47 @@ $("#createMap").click(function () {
 
     reset();
     initMap();
+})
+
+// 随机障碍
+$("#randObstacle").click(function () {
+    let obstacleNum = parseInt($("#obstacleNum").val());
+    if (obstacleNum <= 0) {
+        alert("请输入正确的障碍点数量");
+        return;
+    }
+
+    let obstacleCnt = 0;
+    for (const i in nodes) {
+        for (const j in nodes[i]) {
+            if (nodes[i][j] == -1) {
+                obstacleCnt += 1;
+            }
+        }
+    }
+
+    let limit = mapHeight * mapWidth - 2;
+    if ((obstacleNum + obstacleCnt) > limit) {
+        alert("障碍点数量过大");
+        return;
+    }
+
+    while (obstacleNum > 0) {
+        let x = Math.floor(Math.random() * width);
+        let y = Math.floor(Math.random() * height);
+
+        if ((x == srcX && y == srcY) || (x == dstX && y == dstY)) {
+            continue;
+        }
+
+        if (nodes[y][x] == -1) {
+            continue;
+        }
+
+        nodes[y][x] = -1;
+        setBoxColor(x, y, 1);
+        obstacleNum -= 1;
+    }
 })
 
 // 选择格子大小
