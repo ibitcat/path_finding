@@ -11,7 +11,7 @@ var disType = 0;            // 启发函数类型
 var dirType = 4;            // 搜索方向
 var state = 0;              // 0=节点切换模式; 1=设置开始节点模式; 2=设置结束节点模式
 var isPause = false;        // 是否暂停
-var timerId;                // 定时器id
+var timerId = null;         // 定时器id
 var interval = 1000;        // 定时器间隔时间(毫秒)
 var cameFrom = {};          // 父节点
 var algorithm = 0;          // 寻路算法
@@ -404,6 +404,9 @@ $("#interval").on("change", function () {
 
 // 设置障碍
 $("#map").on("click", ".node", function () {
+    if (timerId != null) {
+        return false;
+    }
     let x = parseInt($(this).attr("x"));
     let y = parseInt($(this).attr("y"));
 
