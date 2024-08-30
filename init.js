@@ -186,7 +186,7 @@ function findPath() {
 
         if (minHeap.isEmpty()) {
             clearInterval(timerId);
-            showNodeNum(nodeNum);
+            showNodeNum(nodeNum, -1);
             alert("没有可搜索的节点!");
             return;
         }
@@ -202,6 +202,7 @@ function findPath() {
             clearInterval(timerId);
 
             // 回溯
+            let pathLen = 0;
             while (true) {
                 let posId = node.x * 1000 + node.y;
                 let parent = cameFrom[posId];
@@ -210,11 +211,12 @@ function findPath() {
                 }
                 setBoxColor(parent.x, parent.y, 7);
                 node = parent;
+                pathLen += 1;
             }
 
             showSrcPos();
             showDstPos();
-            showNodeNum(nodeNum);
+            showNodeNum(nodeNum, pathLen);
             return;
         }
 
@@ -290,14 +292,14 @@ function showDstPos() {
     }
 }
 
-function showNodeNum(nodeNum) {
-    $("#nodeNum").val(nodeNum);
+function showNodeNum(nodeNum, pathLen) {
+    $("#nodeNum").val(nodeNum + "," + pathLen);
 }
 
 function reset() {
     $("#map").empty();
     disableDom(false);
-    showNodeNum(0);
+    showNodeNum(-1, -1);
 
     isPause = false;
     $("#pause").text(isPause ? "继续" : "暂停");
