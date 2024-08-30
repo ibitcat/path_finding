@@ -12,10 +12,11 @@ var dirType = 4;            // 搜索方向
 var state = 0;              // 0=节点切换模式; 1=设置开始节点模式; 2=设置结束节点模式
 var isPause = false;        // 是否暂停
 var timerId = null;         // 定时器id
-var interval = 1000;        // 定时器间隔时间(毫秒)
+var interval = 100;         // 定时器间隔时间(毫秒)
 var cameFrom = {};          // 父节点
 var algorithm = 0;          // 寻路算法
 var hnWeight = 1;           // 启发权重
+var dynamicWeight = false;  // 是否动态调整权重
 
 function newBox(x, y, val) {
     let boxCls = "node_" + boxSize;
@@ -108,26 +109,45 @@ function initMap() {
     createMap();
 }
 
+// 计算动态权重
+function calcHnWeight(x, y) {
+    let dx1 = Math.abs(x - dstX);
+    let dy1 = Math.abs(y - dstY);
+    let dx2 = Math.abs(dstX - srcX);
+    let dy2 = Math.abs(srcY - dstY);
+
+    let mind1 = Math.min(dx1, dy1);
+    let d1 = 14 * mind1 + Math.abs(dx1 - dy1) * 10;
+
+    let mind2 = Math.min(dx2, dy2);
+    let d2 = 14 * mind2 + Math.abs(dx2 - dy2) * 10;
+    return 1 + d1 / d2;
+}
+
 // 计算启发代价
 function heuristic(x1, y1, x2, y2) {
     let dx = Math.abs(x1 - x2);
     let dy = Math.abs(y1 - y2);
+    let hnw = hnWeight;
+    if (dynamicWeight) {
+        hnw = calcHnWeight(x1, y1);
+    }
 
     if (disType == 0) {
         // 曼哈顿距离
-        return hnWeight * (dx * 10 + dy * 10);
+        return Math.floor(hnw * (dx * 10 + dy * 10));
     } else if (disType == 1) {
         // 欧几里得距离
-        return hnWeight * Math.floor(Math.sqrt(dx * dx + dy * dy) * 10);
+        return Math.floor(hnw * Math.sqrt(dx * dx + dy * dy) * 10);
     } else if (disType == 2) {
         // 切比雪夫距离
         let d = Math.max(dx, Math.abs(y1 - y2)) * 10;
-        return hnWeight * d;
+        return Math.floor(hnw * d);
     } else if (disType == 3) {
         // 对角线距离
         let mind = Math.min(dx, dy);
         let d = 14 * mind + Math.abs(dx - dy) * 10;
-        return hnWeight * d;
+        return Math.floor(hnw * d);
     }
 }
 function createNode(x, y, parent, stepCost) {
@@ -302,6 +322,7 @@ function reset() {
 
     isPause = false;
     $("#pause").text(isPause ? "继续" : "暂停");
+    $("#hnWeight").attr('disabled', dynamicWeight);
 
     if (timerId) {
         window.clearInterval(timerId);
@@ -323,6 +344,7 @@ function disableDom(v) {
     $("#randObstacle").attr('disabled', v);
     $("#obstacleNum").attr('disabled', v);
     $("#hnWeight").attr('disabled', v);
+    $("#dynamicWeight").attr('disabled', v);
 }
 
 // dom 响应
@@ -418,6 +440,12 @@ $("#dirType").click(function () {
     } else {
         dirType = 4;
     }
+})
+
+// 是否动态权重
+$("#dynamicWeight").click(function () {
+    dynamicWeight = $(this).prop('checked');
+    $("#hnWeight").attr('disabled', dynamicWeight);
 })
 
 // 选择展示速度

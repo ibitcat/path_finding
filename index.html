@@ -63,10 +63,10 @@
         <div class="line">
             <span style="font-size: 14px;">运行速度：</span>
             <select id="interval">
-                <option value="100">100毫秒</option>
+                <option value="100" selected="selected">100毫秒</option>
                 <option value="200">200毫秒</option>
                 <option value="500">500毫秒</option>
-                <option value="1000" selected="selected">1秒</option>
+                <option value="1000">1秒</option>
                 <option value="3000">3秒</option>
             </select>
         </div>
@@ -90,6 +90,10 @@
             </select>
         </div>
 
+        <div class="line">
+            <span style="font-size: 14px;">动态权重：</span>
+            <input type="checkbox" value="0" id="dynamicWeight" />
+        </div>
         <div class="line">
             <span style="font-size: 14px;">启发权重(整数)：</span>
             <input style="width: 50px;" type="text" value="1" placeholder="权重" id="hnWeight" />
