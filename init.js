@@ -15,6 +15,7 @@ var timerId = null;         // 定时器id
 var interval = 1000;        // 定时器间隔时间(毫秒)
 var cameFrom = {};          // 父节点
 var algorithm = 0;          // 寻路算法
+var hnWeight = 1;           // 启发权重
 
 function newBox(x, y, val) {
     let boxCls = "node_" + boxSize;
@@ -111,13 +112,13 @@ function initMap() {
 function heuristic(x1, y1, x2, y2) {
     if (disType == 0) {
         // 曼哈顿距离
-        return Math.abs(x1 - x2) * 10 + Math.abs(y1 - y2) * 10;
+        return hnWeight * Math.abs(x1 - x2) * 10 + Math.abs(y1 - y2) * 10;
     } else if (disType == 1) {
         // 欧几里得距离
-        return Math.floor(Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) * 10);
+        return hnWeight * Math.floor(Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) * 10);
     } else if (disType == 2) {
         // 切比雪夫距离
-        return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) * 10;
+        return hnWeight * Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) * 10;
     }
 }
 function createNode(x, y, parent, stepCost) {
@@ -128,7 +129,7 @@ function createNode(x, y, parent, stepCost) {
             gn = parent.g + stepCost;
         }
 
-        let hn = heuristic(x, y, dstX, dstY);
+        let hn = heuristic(x, y, dstX, dstY) * 2;
         let node = { f: hn + gn, g: gn, h: hn, x: x, y: y };
         return node;
     } else if (algorithm == 1) {
@@ -303,6 +304,7 @@ function disableDom(v) {
     $("#algorithm").attr('disabled', v);
     $("#randObstacle").attr('disabled', v);
     $("#obstacleNum").attr('disabled', v);
+    $("#hnWeight").attr('disabled', v);
 }
 
 // dom 响应
@@ -474,6 +476,7 @@ $("#map").on("click", ".node", function () {
 })
 
 $("#start").click(function () {
+    hnWeight = parseInt($("#hnWeight").val());
     disableDom(true);
 
     // 如果star在执行,则停止
