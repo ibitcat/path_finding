@@ -115,6 +115,9 @@ function heuristic(x1, y1, x2, y2) {
     } else if (disType == 1) {
         // 欧几里得距离
         return Math.floor(Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) * 10);
+    } else if (disType == 2) {
+        // 切比雪夫距离
+        return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) * 10;
     }
 }
 function createNode(x, y, parent, stepCost) {
