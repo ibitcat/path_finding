@@ -110,15 +110,24 @@ function initMap() {
 
 // 计算启发代价
 function heuristic(x1, y1, x2, y2) {
+    let dx = Math.abs(x1 - x2);
+    let dy = Math.abs(y1 - y2);
+
     if (disType == 0) {
         // 曼哈顿距离
-        return hnWeight * Math.abs(x1 - x2) * 10 + Math.abs(y1 - y2) * 10;
+        return hnWeight * dx * 10 + dy * 10;
     } else if (disType == 1) {
         // 欧几里得距离
-        return hnWeight * Math.floor(Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) * 10);
+        return hnWeight * Math.floor(Math.sqrt(dx * dx + dy * dy) * 10);
     } else if (disType == 2) {
         // 切比雪夫距离
-        return hnWeight * Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) * 10;
+        let d = Math.max(dx, Math.abs(y1 - y2)) * 10;
+        return hnWeight * d;
+    } else if (disType == 3) {
+        // 对角线距离
+        let mind = Math.min(dx, dy);
+        let d = 14 * mind + Math.abs(dx - dy) * 10;
+        return hnWeight * d;
     }
 }
 function createNode(x, y, parent, stepCost) {
@@ -129,7 +138,7 @@ function createNode(x, y, parent, stepCost) {
             gn = parent.g + stepCost;
         }
 
-        let hn = heuristic(x, y, dstX, dstY) * 2;
+        let hn = heuristic(x, y, dstX, dstY);
         let node = { f: hn + gn, g: gn, h: hn, x: x, y: y };
         return node;
     } else if (algorithm == 1) {
@@ -165,6 +174,7 @@ function findPath() {
     });
     cameFrom = {};
 
+    let nodeNum = 0; // 访问的点个数
     let srcNode = createNode(srcX, srcY, null, 0);
     minHeap.push(srcNode);
 
@@ -175,19 +185,20 @@ function findPath() {
         }
 
         if (minHeap.isEmpty()) {
-            console.log("没有可搜索的节点");
             clearInterval(timerId);
-            alert("没有可搜索的节点");
+            showNodeNum(nodeNum);
+            alert("没有可搜索的节点!");
             return;
         }
 
         // 弹出代价最小的节点
         let node = minHeap.pop();
         setBoxColor(node.x, node.y, 5);
+        nodeNum += 1;
 
         // 找到了终点
         if (node.x == dstX && node.y == dstY) {
-            console.log("找到了终点");
+            console.log("找到了终点! 搜索节点数：", nodeNum);
             clearInterval(timerId);
 
             // 回溯
@@ -203,6 +214,7 @@ function findPath() {
 
             showSrcPos();
             showDstPos();
+            showNodeNum(nodeNum);
             return;
         }
 
@@ -278,9 +290,14 @@ function showDstPos() {
     }
 }
 
+function showNodeNum(nodeNum) {
+    $("#nodeNum").val(nodeNum);
+}
+
 function reset() {
     $("#map").empty();
     disableDom(false);
+    showNodeNum(0);
 
     isPause = false;
     $("#pause").text(isPause ? "继续" : "暂停");

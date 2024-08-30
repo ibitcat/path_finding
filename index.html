@@ -86,12 +86,18 @@
                 <option value="0" selected="selected">曼哈顿距离</option>
                 <option value="1">欧几里得距离</option>
                 <option value="2">切比雪夫距离</option>
+                <option value="3">对角线距离</option>
             </select>
         </div>
 
         <div class="line">
             <span style="font-size: 14px;">启发权重(整数)：</span>
             <input style="width: 50px;" type="text" value="1" placeholder="权重" id="hnWeight" />
+        </div>
+
+        <div class="line">
+            <span style="font-size: 14px;">搜索节点数：</span>
+            <input style="width: 50px;" type="text" value="0" id="nodeNum" readonly="readonly" />
         </div>
 
         <div class="line">
