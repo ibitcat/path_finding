@@ -299,7 +299,6 @@ function showNodeNum(nodeNum, pathLen) {
 function reset() {
     $("#map").empty();
     disableDom(false);
-    showNodeNum(-1, -1);
 
     isPause = false;
     $("#pause").text(isPause ? "继续" : "暂停");
