@@ -115,7 +115,7 @@ function heuristic(x1, y1, x2, y2) {
 
     if (disType == 0) {
         // 曼哈顿距离
-        return hnWeight * dx * 10 + dy * 10;
+        return hnWeight * (dx * 10 + dy * 10);
     } else if (disType == 1) {
         // 欧几里得距离
         return hnWeight * Math.floor(Math.sqrt(dx * dx + dy * dy) * 10);
