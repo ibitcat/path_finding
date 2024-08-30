@@ -1,6 +1,6 @@
 
-var mapWidth = 10;          // 地图宽
-var mapHeight = 10;         // 地图高
+var width = 10;             // 地图宽
+var height = 10;         // 地图高
 var boxSize = 40;           // 格子大小
 var nodes = [];             // 地图所有节点(0=初始可行走;>0待检查(最小堆的索引号);-1=障碍;-2=已关闭)
 var srcX = -1;              // 起点x
@@ -376,7 +376,7 @@ $("#randObstacle").click(function () {
         }
     }
 
-    let limit = mapHeight * mapWidth - 2;
+    let limit = height * width - 2;
     if ((obstacleNum + obstacleCnt) > limit) {
         alert("障碍点数量过大");
         return;
