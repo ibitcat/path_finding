@@ -423,8 +423,12 @@ $("#algorithm").on("change", function () {
 
     if (algorithm == 0) {
         $("#hn").css("display", "block");
+        $("#wn").css("display", "block");
+        $("#dwn").css("display", "block");
     } else {
         $("#hn").css("display", "none");
+        $("#wn").css("display", "none");
+        $("#dwn").css("display", "none");
     }
 })
 
