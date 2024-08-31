@@ -265,6 +265,15 @@ function neighborNode(minHeap, parent) {
             continue;
         }
 
+        if (i >= 4) {
+            let n1 = nodes[parent.y][x];
+            let n2 = nodes[y][parent.x];
+            if (n1 < 0 || n2 < 0) {
+                // 障碍
+                continue;
+            }
+        }
+
         let boxId = "#box-" + x + "-" + y;
         let maskId = "#mask-" + x + "-" + y;
         let index = nodes[y][x];
