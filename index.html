@@ -2,127 +2,88 @@
 
 <html>
 
-<!--head-->
-
 <head>
     <meta charset="utf-8">
     <title>寻路算法演示</title>
     <link rel="shortcut icon" href="#" />
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <link rel="stylesheet" href="normalize.css" type="text/css" media="screen">
     <script text="text/javascript" src="jquery-3.7.1.min.js"></script>
     <script text="text/javascript" src="minheap.js"></script>
+    <script text="text/javascript" src="util.js"></script>
+    <script text="text/javascript" src="map.js"></script>
 </head>
 
-<!--body-->
+<body>
+    <div id="container">
+        <canvas id="mainCanvas" width="100vw" height="100vh" style="position: absolute; z-index: 1;"></canvas>
+        <canvas id="subCanvas" width="100vw" height="100vh" style="position: absolute; z-index: 2; pointer-events:none"></canvas>
 
-<body style="margin-left: 50px;margin-top: 30px;">
-    <div style="float: left; width: 20%;">
-        <div class="line">
-            <span style="font-size: 14px;">地图宽：</span>
-            <select id="mapWidth" style="width: 100px;">
-                <option value="10" selected="selected">10</option>
-                <option value="20">20</option>
-                <option value="30">30</option>
-            </select>
-        </div>
-        <div class="line">
-            <span style="font-size: 14px;">地图高：</span>
-            <select id="mapHeight" style="width: 100px;">
-                <option value="10" selected="selected">10</option>
-                <option value="20">20</option>
-                <option value="30">30</option>
-            </select>
-        </div>
-        <!--div class="line">
-            <span style="font-size: 14px;">方格宽高：</span>
-            <select id="boxSize">
-                <option value="30" selected="selected">30px</option>
-                <option value="40">40px</option>
-            </select>
-        </div-->
-        <div class="line">
-            <button type="button" id="createMap">生成地图</button>
-        </div>
-        <div class="line">
-            <span style="font-size: 14px;">障碍个数：</span>
-            <input style="width: 50px;" type="text" value="5" placeholder="个数" id="obstacleNum" />
-            <button type="button" id="randObstacle">随机障碍</button>
-        </div>
+        <div id="tip">
+            <p>选定起点：<span id="srcPos">(0 , 0)</span><i id="srcColor"></i></p>
+            <p>选定终点：<span id="dstPos">(0 , 0)</span><i id="dstColor"></i></p>
+            <p>障碍个数：
+                <input style="width: 50px;" type="text" value="5" placeholder="个数" id="blockNum" />
+                <button type="button" id="randBlock">随机障碍</button>
+            </p>
 
-        <div class="line">
-            <input type="button" value="开始坐标(红色)" id="srcPos" />
-            <input type="button" value="结束坐标(蓝色)" id="dstPos" />
-        </div>
+            <p>演示间隔：
+                <select id="interval">
+                    <option value="100" selected="selected">100毫秒</option>
+                    <option value="200">200毫秒</option>
+                    <option value="500">500毫秒</option>
+                    <option value="1000">1秒</option>
+                    <option value="3000">3秒</option>
+                </select>
+            </p>
 
-        <div class="line">
-            <span style="font-size: 14px;">允许斜着走：</span>
-            <input type="checkbox" value="0" id="dirType" />
-        </div>
+            <p>选择算法：
+                <select id="algorithm">
+                    <option value="0" selected="selected">A*算法</option>
+                    <option value="1">dijkstra</option>
+                    <option value="2">最佳优先搜索算法</option>
+                    <option value="3">JPS算法</option>
+                </select>
+            </p>
 
-        <div class="line">
-            <span style="font-size: 14px;">运行速度：</span>
-            <select id="interval">
-                <option value="100" selected="selected">100毫秒</option>
-                <option value="200">200毫秒</option>
-                <option value="500">500毫秒</option>
-                <option value="1000">1秒</option>
-                <option value="3000">3秒</option>
-            </select>
-        </div>
-
-        <div class="line">
-            <span style="font-size: 14px;">寻路算法：</span>
-            <select id="algorithm">
-                <option value="0" selected="selected">A星算法</option>
-                <option value="1">dijkstra</option>
-                <option value="2">最佳优先搜索算法</option>
-            </select>
-        </div>
-
-        <div class="line" id="hn">
-            <span style="font-size: 14px;">启发式函数：</span>
-            <select id="disType">
-                <option value="0" selected="selected">曼哈顿距离</option>
-                <option value="1">欧几里得距离</option>
-                <option value="2">切比雪夫距离</option>
-                <option value="3">对角线距离</option>
-            </select>
-        </div>
-
-        <div class="line" id="dwn">
-            <span style="font-size: 14px;">动态权重：</span>
-            <input type="checkbox" value="0" id="dynamicWeight" />
-        </div>
-        <div class="line" id="wn">
-            <span style="font-size: 14px;">启发权重(整数)：</span>
-            <input style="width: 50px;" type="text" value="1" placeholder="权重" id="hnWeight" />
-        </div>
-
-        <div class="line">
-            <span style="font-size: 14px;">搜索节点数和路径点数：</span>
-            <input style="width: 50px;" type="text" value="-1,-1" id="nodeNum" readonly="readonly" />
-        </div>
-
-        <div class="line">
-            <button type="button" id="start">开始</button>
-            <button type="button" id="pause">暂停</button>
-            <button type="button" id="reset">还原</button>
-        </div>
-    </div>
-
-    <div style="float: left; width: 80%; ">
-        <div class="line" id="map">
-            <div class='col'>
+            <div id="hn">
+                <p>启发式函数：
+                    <select id="hnType">
+                        <option value="0" selected="selected">曼哈顿距离</option>
+                        <option value="1">欧几里得距离</option>
+                        <option value="2">切比雪夫距离</option>
+                        <option value="3">对角线距离</option>
+                    </select>
+                </p>
             </div>
+
+            <div id="astar">
+                <p>
+                    <span>动态权重：</span>
+                    <input type="checkbox" value="0" id="dynWeight" />
+                </p>
+            </div>
+
+            <div id="diagonal">
+                <p>
+                    <span>允许斜走：</span>
+                    <input type="checkbox" value="0" id="canDiagonal" />
+                </p>
+            </div>
+
+            <p>
+                <input type="button" value="开始" id="begin">
+                <input type="button" value="暂停" id="pause">
+                <input type="button" value="清除" id="clear">
+            </p>
         </div>
     </div>
 
-    <script text="text/javascript" src="init.js"></script>
+    <script text="text/javascript" src="main.js"></script>
     <script text="text/javascript">
         $(function () {
-            console.log("init");
-            initMap();
+            start();
         });
     </script>
 </body>

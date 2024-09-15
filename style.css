@@ -1,79 +1,52 @@
-.line {
-    margin-top: 10px;
+p {
+    color: #efefef;
+    font-size: 14px;
+    margin: 0;
+    padding: 5px 10px;
 }
 
-.col {
+select {
+    margin-top: 12px;
     width: 100%;
-    float: left;
-    margin-top: 2px;
 }
 
-.fn {
-    width: 50%;
-    height: 50%;
-    float: left;
-    font-size: 25cqw;
-    color: red;
-    /* font-size: 1cqw; */
-    /* display: flex;
-    justify-content: space-between;
-    align-items: left; */
+#container {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center; 
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    height: 100vh;
+    /* 使容器高度占满整个视口 */
 }
 
-.in {
-    width: 50%;
-    height: 50%;
-    float: left;
-    font-size: 25cqw;
-}
-
-.gn {
-    width: 50%;
-    height: 50%;
-    float: left;
-    font-size: 25cqw;
-    color: orange;
-}
-
-.hn {
-    width: 50%;
-    height: 50%;
-    float: left;
-    font-size: 25cqw;
-}
-
-.node_30 {
-    width: 30px;
-    height: 30px;
-    background: #ccc;
-    float: left;
-    margin-left: 2px;
-    container-type: inline-size;
-}
-
-.node_40 {
-    width: 40px;
-    height: 40px;
-    background: #ccc;
-    float: left;
-    margin-left: 2px;
-    container-type: inline-size;
-}
-
-.mask_30 {
+/*t提示框*/
+#tip {
+    border-radius: 5px;
+    cursor: pointer;
     position: absolute;
-    width: 30px;
-    height: 30px;
-    float: left;
-    font-size: 50cqw;
-    text-align: center;
+    right: 30px;
+    top: 40px;
+    background: rgba(30, 30, 30, 0.6);
+    width: 200px;
+    min-height: 300px;
+    z-index: 3;
 }
 
-.mask_40 {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    float: left;
-    font-size: 50cqw;
-    text-align: center;
+#srcColor {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+    background-color: #ff3366;
+}
+
+#dstColor {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+    background-color: #3366ff;
 }

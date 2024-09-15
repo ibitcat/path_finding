@@ -4,7 +4,6 @@ class MinHeap {
     constructor(cb) {
         this.queue = new Array();
         this.n = 0;             // 元素个数(注意：第0号位置不使用)
-        this.on = cb;           // 元素变化的回调
     }
 
     // 获取元素
@@ -15,9 +14,6 @@ class MinHeap {
     setElem(idx, elem) {
         elem.idx = idx;
         this.queue[idx] = elem;
-        if (this.on) {
-            this.on(elem);
-        }
     }
 
     delElem(idx) {
@@ -25,10 +21,6 @@ class MinHeap {
         elem.idx = -1;
         this.n--;
         this.queue[idx] = null;
-
-        if (this.on) {
-            this.on(elem);
-        }
         return elem;
     }
 
@@ -112,10 +104,10 @@ class MinHeap {
     compare(i, j) {
         let elemi = this.queue[i];
         let elemj = this.queue[j];
-        if (elemi.f === elemj.f) {
-            return elemi.g < elemj.g;
+        if (elemi.fn === elemj.fn) {
+            return elemi.gn < elemj.gn;
         } else {
-            return elemi.f > elemj.f;
+            return elemi.fn > elemj.fn;
         }
     }
 
@@ -142,54 +134,3 @@ class MinHeap {
         }
     }
 }
-
-// test minHeap
-function random(range) {
-    return Math.floor(Math.random() * range) + 1
-}
-
-function test() {
-    console.log("test--------->");
-    let minHeap = new MinHeap();
-
-    // test push
-    minHeap.push({ f: 70, g: 30 });
-    minHeap.push({ f: 59, g: 78 });
-    minHeap.push({ f: 41, g: 49 });
-    minHeap.push({ f: 98, g: 39 });
-    minHeap.push({ f: 4, g: 75 });
-    minHeap.push({ f: 16, g: 51 });
-    minHeap.push({ f: 14, g: 34 });
-    minHeap.push({ f: 51, g: 47 });
-    minHeap.push({ f: 41, g: 68 });
-    minHeap.push({ f: 5, g: 51 });
-    console.log(minHeap.compare(4, 4 + 1));
-
-    // test random push
-    // for (var i = 0; i < 10; i++) {
-    //     let elem = { f: random(100), g: random(100) };
-    //     console.log(elem);
-    //     minHeap.push(elem);
-    // }
-    console.log(minHeap.queue);
-
-    // test pop
-    // console.log("\ntest pop--------->");
-    // console.log(minHeap.pop());
-    // console.log(minHeap);
-
-    // test remove
-    // console.log("\ntest remove--------->");
-    // minHeap.remove(random(10));
-    // console.log(minHeap);
-
-    // test update
-    console.log("\ntest update--------->");
-    let index = 1; //random(10);
-    let elem = { f: random(100), g: random(100) }
-    console.log(index, elem);
-    minHeap.update(index, { f: 50, g: 16 });
-    console.log(minHeap);
-}
-
-//test();
