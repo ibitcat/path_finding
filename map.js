@@ -44,6 +44,42 @@ class Grid {
         mainCtx.clearRect(this.px + 1, this.py + 1, fillSize, fillSize);
         mainCtx.fillRect(this.px + 1, this.py + 1, fillSize, fillSize);
     }
+
+    // 获取强制邻居
+    getForceNeighbors(type, dir) {
+        let neighbors = [];
+        if (type == "x") {
+            let y = this.y - 1;
+            let grid1 = this.map.canPass(this.x, y); // 上方
+            let grid2 = this.map.canPass(this.x + dir, y); // 右上|| 左上
+            if (!grid1 && grid2) {
+                neighbors.push(grid2);
+            }
+
+            y = this.y + 1;
+            grid1 = this.map.canPass(this.x, y); // 下方
+            grid2 = this.map.canPass(this.x + dir, y); // 右下 || 左下
+            if (!grid1 && grid2) {
+                neighbors.push(grid2);
+            }
+        } else if (type == "y") {
+            let x = this.x - 1;
+            let grid1 = this.map.canPass(x, this.y); // 左方
+            let grid2 = this.map.canPass(x, this.y + dir); // 左下|| 左上
+            if (!grid1 && grid2) {
+                neighbors.push(grid2);
+            }
+
+            x = this.x + 1;
+            grid1 = this.map.canPass(x, this.y); // 右方
+            grid2 = this.map.canPass(x, this.y + dir); // 右下|| 右上
+            if (!grid1 && grid2) {
+                neighbors.push(grid2);
+            }
+        }
+        neighbors.forEach((grid) => grid.fill("yellow"));
+        return neighbors;
+    }
 }
 
 class GridNode {
@@ -132,6 +168,59 @@ class GridNode {
             drawArrow(subCtx, formX, formY, toX, toY, 3, which);
         }
         subCtx.restore();
+    }
+
+    // 根据父跳点到该跳点的方向获取周围可探索的邻居
+    getNeighbors() {
+        let grid = this.grid;
+        let map = grid.map;
+
+        let nbs = [];
+        if (!this.p) {
+            for (let index = 0; index < dirs.length; index++) {
+                const dir = dirs[index];
+                let x = grid.x + dir[0];
+                let y = grid.y + dir[1];
+                let ngrid = map.canPass(x, y);
+                if (ngrid) {
+                    nbs.push(ngrid);
+                }
+            }
+        } else {
+            let pgrid = this.p.grid;
+            let dx = Math.sign(grid.x - pgrid.x);
+            let dy = Math.sign(grid.y - pgrid.y);
+            if (dx != 0) {
+                let xgrid = map.canPass(grid.x + dx, grid.y);
+                if (xgrid) {
+                    nbs.push(xgrid);
+                }
+            }
+            if (dy != 0) {
+                let ygrid = map.canPass(grid.x, grid.y + dy);
+                if (ygrid) {
+                    nbs.push(ygrid);
+                }
+            }
+            if (dx != 0 && dy != 0) {
+                // 斜向
+                let xygrid = map.canPass(grid.x + dx, grid.y + dy);
+                if (xygrid) {
+                    nbs.push(xygrid);
+                }
+            }
+
+            // 强制邻居
+            if (dx != 0) {
+                let fnbs = grid.getForceNeighbors("x", dx);
+                nbs.push(...fnbs);
+            }
+            if (dy != 0) {
+                let fnbs = grid.getForceNeighbors("y", dy);
+                nbs.push(...fnbs);
+            }
+        }
+        return nbs;
     }
 }
 
@@ -651,6 +740,7 @@ class GridMap {
                 }
 
                 if (grid) {
+                    // eg.: 右下可走
                     nbs.push(grid);
                 }
 
@@ -664,21 +754,25 @@ class GridMap {
                 if (grid) {
                     nbs.push(grid);
                 }
-                if (!this.canPass(jpx, jpy - 1) && this.canPass(jpx + dx, jpy - 1)) {
-                    nbs.push(this.getGrid(jpx + dx, jpy - 1));
-                }
-                if (!this.canPass(jpx, jpy + 1) && this.canPass(jpx + dx, jpy + 1)) {
-                    nbs.push(this.getGrid(jpx + dx, jpy + 1));
+                if (this.canPass(jpx + dx, jpy)) {
+                    if (!this.canPass(jpx, jpy - 1) && this.canPass(jpx + dx, jpy - 1)) {
+                        nbs.push(this.getGrid(jpx + dx, jpy - 1));
+                    }
+                    if (!this.canPass(jpx, jpy + 1) && this.canPass(jpx + dx, jpy + 1)) {
+                        nbs.push(this.getGrid(jpx + dx, jpy + 1));
+                    }
                 }
             } else if (dy != 0) {
                 if (grid) {
                     nbs.push(grid);
                 }
-                if (!this.canPass(jpx - 1, jpy) && this.canPass(jpx - 1, jpy + dy)) {
-                    nbs.push(this.getGrid(jpx - 1, jpy + dy));
-                }
-                if (!this.canPass(jpx + 1, jpy) && this.canPass(jpx + 1, jpy + dy)) {
-                    nbs.push(this.getGrid(jpx + 1, jpy + dy));
+                if (this.canPass(jpx, jpy + dy)) {
+                    if (!this.canPass(jpx - 1, jpy) && this.canPass(jpx - 1, jpy + dy)) {
+                        nbs.push(this.getGrid(jpx - 1, jpy + dy));
+                    }
+                    if (!this.canPass(jpx + 1, jpy) && this.canPass(jpx + 1, jpy + dy)) {
+                        nbs.push(this.getGrid(jpx + 1, jpy + dy));
+                    }
                 }
             }
         }
@@ -698,14 +792,22 @@ class GridMap {
                 jpGrid = grid;
                 break;
             }
-
-            if (
-                (!this.canPass(sx, startY - 1) && this.canPass(sx + dx, startY - 1)) ||
-                (!this.canPass(sx, startY + 1) && this.canPass(sx + dx, startY + 1))
-            ) {
+            let fnbs = grid.getForceNeighbors("x", dx);
+            if (fnbs.length > 0) {
                 jpGrid = grid;
                 break;
             }
+
+            // let frontGrid = this.canPass(sx + dx, startY);
+            // if (
+            //     frontGrid &&
+            //     ((!this.canPass(sx, startY - 1) && this.canPass(sx + dx, startY - 1)) ||
+            //         (!this.canPass(sx, startY + 1) && this.canPass(sx + dx, startY + 1)))
+            // ) {
+            //     jpGrid = grid;
+            //     //jpGrid = frontGrid;
+            //     break;
+            // }
         }
         return { jpGrid: jpGrid, x: sx };
     }
@@ -723,14 +825,22 @@ class GridMap {
                 jpGrid = grid;
                 break;
             }
-
-            if (
-                (!this.canPass(startX - 1, sy) && this.canPass(startX - 1, sy + dy)) ||
-                (!this.canPass(startX + 1, sy) && this.canPass(startX + 1, sy + dy))
-            ) {
+            let fnbs = grid.getForceNeighbors("y", dy);
+            if (fnbs.length > 0) {
                 jpGrid = grid;
                 break;
             }
+
+            // let frontGrid = this.canPass(startX, sy + dy);
+            // if (
+            //     frontGrid &&
+            //     ((!this.canPass(startX - 1, sy) && this.canPass(startX - 1, sy + dy)) ||
+            //         (!this.canPass(startX + 1, sy) && this.canPass(startX + 1, sy + dy)))
+            // ) {
+            //     jpGrid = grid;
+            //     //jpGrid = frontGrid;
+            //     break;
+            // }
         }
         return { jpGrid: jpGrid, y: sy };
     }
@@ -745,12 +855,18 @@ class GridMap {
             return jpGrid;
         }
 
-        if (
-            (!this.canPass(startX, startY - dy) && this.canPass(startX + dx, startY - dy)) ||
-            (!this.canPass(startX - dx, startY) && this.canPass(startX - dx, startY + dy))
-        ) {
+        let xfnbs = jpGrid.getForceNeighbors("x", dx);
+        let yfnbs = jpGrid.getForceNeighbors("y", dy);
+        if (xfnbs.length > 0 || yfnbs.length > 0) {
             return jpGrid;
         }
+
+        // if (
+        //     (!this.canPass(startX, startY - dy) && this.canPass(startX + dx, startY - dy)) ||
+        //     (!this.canPass(startX - dx, startY) && this.canPass(startX - dx, startY + dy))
+        // ) {
+        //     return jpGrid;
+        // }
 
         // 返回false表示要继续搜索水平、垂直两个方向
         return false;
@@ -766,7 +882,7 @@ class GridMap {
 
         if (dx != 0 && dy != 0) {
             while (true) {
-                console.log("startXY", startX, startY, dx, dy);
+                //console.log("startXY", startX, startY, dx, dy);
                 if (dx != 0 && dy != 0) {
                     let jpGrid = this.getGrid(startX, startY);
                     if (!jpGrid) {
@@ -781,11 +897,11 @@ class GridMap {
                     }
 
                     let nStartX = startX + dx;
-                    let res = this.jumpX(nStartX, startY, dx);
+                    let res = this.jumpX(startX, startY, dx);
                     from = this.getPixel(startX, startY, offset, offset);
                     to = this.getPixel(res.x, startY, offset, offset);
-                    console.log("startXY, dx", nStartX, startY, res.x);
-                    if (res.x != nStartX) {
+                    //console.log("startXY, dx", startX, res.x);
+                    if (from[0] != to[0] || from[1] != to[1]) {
                         drawArrow(this.subCtx, from[0], from[1], to[0], to[1], 3, undefined, undefined, undefined, "brown", true);
                     }
                     if (res.jpGrid) {
@@ -793,11 +909,11 @@ class GridMap {
                     }
 
                     let nStartY = startY + dy;
-                    res = this.jumpY(startX, nStartY, dy);
-                    console.log("startXY, dy", startX, nStartY, res.y);
+                    res = this.jumpY(startX, startY, dy);
+                    //console.log("startXY, dy", startX, nStartY, res.y);
                     from = this.getPixel(startX, startY, offset, offset);
                     to = this.getPixel(startX, res.y, offset, offset);
-                    if (res.y != nStartY) {
+                    if (from[0] != to[0] || from[1] != to[1]) {
                         drawArrow(this.subCtx, from[0], from[1], to[0], to[1], 3, undefined, undefined, undefined, "brown", true);
                     }
                     if (res.jpGrid) {
@@ -815,24 +931,21 @@ class GridMap {
             //console.log("startX", startX, startY, res.x);
             let from = this.getPixel(pre.x, pre.y, offset, offset);
             let to = this.getPixel(res.x, startY, offset, offset);
-            if (res.x != startX) {
-                drawArrow(this.subCtx, from[0], from[1], to[0], to[1], 3, undefined, undefined, undefined, "brown", true);
-            }
+            drawArrow(this.subCtx, from[0], from[1], to[0], to[1], 3, undefined, undefined, undefined, "brown", true);
             return res.jpGrid;
         } else if (dy != 0) {
             let res = this.jumpY(startX, startY, dy);
             //console.log("startY", startX, startY, res.y);
             let from = this.getPixel(pre.x, pre.y, offset, offset);
             let to = this.getPixel(startX, res.y, offset, offset);
-            if (res.y != startY) {
-                drawArrow(this.subCtx, from[0], from[1], to[0], to[1], 3, undefined, undefined, undefined, "brown", true);
-            }
+            drawArrow(this.subCtx, from[0], from[1], to[0], to[1], 3, undefined, undefined, undefined, "brown", true);
             return res.jpGrid;
         }
     }
     // jps 寻路
     jps(jp) {
-        let nbs = this.pruneNbs(jp);
+        //let nbs = this.pruneNbs(jp);
+        let nbs = jp.getNeighbors();
         console.log("next nbs", jp.grid.x, jp.grid.y, nbs);
         for (let index = 0; index < nbs.length; index++) {
             let nb = nbs[index];
