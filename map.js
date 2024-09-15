@@ -537,6 +537,11 @@ class GridMap {
     }
 
     clear() {
+        let timerId = this.timerId;
+        if (timerId) {
+            this.timerId = null;
+            clearInterval(timerId);
+        }
         this.setFinding(false);
 
         for (let index = 0; index < this.grids.length; index++) {

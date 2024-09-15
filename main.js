@@ -43,10 +43,13 @@ $("#begin").on("click", function () {
 
 $("#pause").on("click", function () {
     map.isPause = !map.isPause;
-    $(this).text(isPause ? "继续" : "暂停");
+    $(this).val(map.isPause ? "继续" : "暂停");
 });
 
 $("#clear").on("click", function () {
+    map.isPause = false;
+    $("#pause").val(map.isPause ? "继续" : "暂停");
+
     disablePanel(false);
     map.clear();
 });
