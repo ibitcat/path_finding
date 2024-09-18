@@ -76,6 +76,19 @@ class Grid {
         }
     }
 
+    drawArc(color) {
+        let ctx = this.map.mainCtx;
+        let half = Math.floor(this.map.gridPixel / 2);
+        ctx.save();
+        //ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(this.px + half, this.py + half, 5, 0, Math.PI * 2, false);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.closePath();
+        ctx.restore();
+    }
+
     getVecNeighbor(dx, dy) {
         let x = this.x + dx;
         let y = this.y + dy;
@@ -482,6 +495,7 @@ class GridMap {
         this.srcGrid = grid;
         grid.isStart = true;
         grid.fill(srcColor);
+        grid.drawArc("blue");
         $("#srcPos").text("(" + grid.x + ", " + grid.y + ")");
     }
 
@@ -499,6 +513,7 @@ class GridMap {
         this.dstGrid = grid;
         grid.isEnd = true;
         grid.fill(dstColor);
+        grid.drawArc("red");
         $("#dstPos").text("(" + grid.x + ", " + grid.y + ")");
     }
 
