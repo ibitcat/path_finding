@@ -84,6 +84,9 @@ function drawArrow(ctx, x1, y1, x2, y2, style, which, angle, d, color, dash) {
     if (typeof y1 == "string") y1 = parseInt(y1);
     if (typeof x2 == "string") x2 = parseInt(x2);
     if (typeof y2 == "string") y2 = parseInt(y2);
+    if (x1 == x2 && y1 == y2) {
+        return;
+    }
     style = typeof style != "undefined" ? style : 3;
     which = typeof which != "undefined" ? which : 1; // end point gets arrow
     angle = typeof angle != "undefined" ? angle : Math.PI / 8;
