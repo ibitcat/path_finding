@@ -978,6 +978,7 @@ class GridMap {
         let srcY = this.srcGrid.y;
         let srcNode = this.newGridNode(srcX, srcY, null, 0);
         minHeap.push(srcNode);
+        this.nodes[this.getPosIdx(srcX, srcY)] = srcNode;
 
         this.timerId = window.setInterval(() => {
             if (this.isPause) {
