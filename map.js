@@ -82,7 +82,7 @@ class Grid {
         ctx.save();
         //ctx.globalCompositeOperation = "destination-out";
         ctx.beginPath();
-        ctx.arc(this.px + half, this.py + half, 5, 0, Math.PI * 2, false);
+        ctx.arc(this.px + half, this.py + half, 10, 0, Math.PI * 2, false);
         ctx.fillStyle = color;
         ctx.fill();
         ctx.closePath();
