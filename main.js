@@ -15,6 +15,7 @@ $("#randBlock").on("click", function () {
 // 选择寻路算法
 $("#algorithm").on("change", function () {
     map.algorithm = parseInt($(this).val());
+    $("#diagonal").css("display", map.algorithm == 3 ? "none" : "block");
 });
 
 // 选择运行速度
