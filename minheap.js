@@ -3,7 +3,7 @@
 class MinHeap {
     constructor(cb) {
         this.queue = new Array();
-        this.n = 0;             // 元素个数(注意：第0号位置不使用)
+        this.n = 0; // 元素个数(注意：第0号位置不使用)
     }
 
     // 获取元素
@@ -50,7 +50,7 @@ class MinHeap {
         }
         let elem = this.delElem(1);
         if (this.n > 0) {
-            this.setElem(1, this.queue[this.n + 1])
+            this.setElem(1, this.queue[this.n + 1]);
             this.queue[this.n + 1] = null;
         }
         this.sink(1);
@@ -64,8 +64,7 @@ class MinHeap {
         }
 
         if (i === this.n) {
-            this.delElem(i);
-            return elem;
+            return this.delElem(i);
         }
         if (i === 1) {
             return this.pop();
